@@ -11,14 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        with:
-          command: android debug
-          buildozer_version: stable
+      - name: Build APK with buildozer
+        run: |
+          docker run --rm \
+            -v "$PWD":/home/user/hostcwd \
+            kivy/buildozer:latest android debug
+
+      - name: Show build output
+        if: always()
+        run: ls -la bin || true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: apk
           path: bin/*.apk
+          if-no-files-found: warn
